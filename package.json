@@ -10,6 +10,7 @@
     "format": "biome format --write"
   },
   "dependencies": {
+    "@fluentui/react": "^8.124.1",
     "@fluentui/react-components": "^9.72.2",
     "@fluentui/react-icons": "^2.0.312",
     "next": "15.5.5",
