@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Title2, Label, Switch, Button, Text } from '@fluentui/react-components';
 import { useTheme } from '@/app/providers/theme';
 
-export default function ConfigPage() {
+export default function SettingsPage() {
     const { isDark, toggleTheme } = useTheme();
 
     const router = useRouter();
