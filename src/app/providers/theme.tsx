@@ -30,7 +30,7 @@ export const useTheme = () => {
     return context;
 };
 
-export function ThemeProviderWrapper({ children }: { children: React.ReactNode }) {
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const [currentTheme, setCurrentTheme] = useState<Theme>(getInitialTheme);
     const isDark = currentTheme === webDarkTheme;
 
