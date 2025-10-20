@@ -1,0 +1,19 @@
+{
+  "administration": "Administration",
+  "dashboard": "Dashboard",
+  "analytics": "Analytics",
+  "holidays": "Holidays",
+  "therapy": "Therapy",
+  "people": "People",
+  "patients": "Patients",
+  "therapists": "Therapists",
+  "legal-guardians": "Legal guardians",
+  "clinical-records": "Clinical records",
+  "tariffs": "Tariffs",
+  "planning": "Planning",
+  "sessions-calendar": "Session calendar",
+  "data": "Personal data",
+  "accounts": "Accounts and access",
+  "settings": "Settings",
+  "sign-out": "Sign out"
+}

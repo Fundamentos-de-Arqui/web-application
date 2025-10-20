@@ -1,0 +1,19 @@
+{
+  "administration": "Administración",
+  "dashboard": "Dashboard",
+  "analytics": "Analíticas",
+  "holidays": "Feriados",
+  "therapy": "Terapia",
+  "people": "Personas",
+  "patients": "Pacientes",
+  "therapists": "Terapeutas",
+  "legal-guardians": "Responsables legales",
+  "clinical-records": "Historias clínicas",
+  "tariffs": "Tarifario",
+  "planning": "Planificación",
+  "sessions-calendar": "Calendario de sesiones",
+  "data": "Datos personales",
+  "accounts": "Cuentas y acceso",
+  "settings": "Ajustes",
+  "sign-out": "Cerrar sesión"
+}
