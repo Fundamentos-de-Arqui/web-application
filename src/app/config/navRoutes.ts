@@ -64,14 +64,9 @@ const Patients : NavCategoryItemProps = {
     iconSelected: PersonNote20Filled,
     value: "05-00"
 }
-const PatientsData: NavCategorySubItemProps = { 
-    href: "/patients/data",
-    labelKey: "data",
-    value: "05-01",
-};
 const PatientsClinicalRecords: NavCategorySubItemProps = { 
-    href: "/patients/clinical-records",
-    labelKey: "clinical-records",
+    href: "/patients/filiation-files",
+    labelKey: "filiation-files",
     value: "05-02",
 };
 const PatientsTariffs: NavCategorySubItemProps = { 
@@ -81,7 +76,7 @@ const PatientsTariffs: NavCategorySubItemProps = {
 };
 const PatientsCategory: NavCategoryProps = { 
     ...Patients,
-    items: [PatientsData, PatientsClinicalRecords, PatientsTariffs],
+    items: [PatientsClinicalRecords, PatientsTariffs],
 };
 const Therapists : NavCategoryItemProps = { 
     labelKey: "therapists",
