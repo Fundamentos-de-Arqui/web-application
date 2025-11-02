@@ -92,3 +92,5 @@ export default function PatientsFiliationFilesPage() {
         </div>
     );
 }
+
+//http://localhost:4000/api/profiles/getPatientProfiles?status=NNN&page_size=N&page=N

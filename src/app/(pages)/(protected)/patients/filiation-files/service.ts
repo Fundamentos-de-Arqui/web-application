@@ -1,5 +1,6 @@
 import {PatientSummary} from "@/app/(pages)/(protected)/patients/filiation-files/model/PatientSummary";
 
+
 //Resource
 interface PatientSummaryDto {
     id: number;
@@ -19,8 +20,42 @@ interface PatientsSummaryWrapperDto {
     patients: PatientSummaryDto[];
 }
 
+async function fetchFromApi(status: string, page: number, pageSize: number): Promise<PatientsSummaryWrapperDto> {
+    const ApiUrl = process.env.PATIENTS_SUMMARY_ENDPOINT;
+
+    const params = new URLSearchParams({
+        status: status,
+        pageSize: pageSize.toString(),
+        page: page.toString(),
+    });
+
+    const url = `${ApiUrl}?${params.toString()}`;
+
+    console.log(`Fetching patients summary from API: ${url}`);
+
+    try {
+        const response = await fetch(url,{
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch patients summary: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log(data);
+        return data;
+    } catch (error) {
+        console.error('Error fetching patients summary:', error);
+        throw error;
+    }
+}
+
 //Call to api gateway
-async function getData(): Promise<PatientsSummaryWrapperDto> {
+async function getMockData(): Promise<PatientsSummaryWrapperDto> {
     return new Promise((resolve) => {
         setTimeout(() => {
             const patients: PatientSummaryDto[] = [
@@ -66,6 +101,33 @@ async function getData(): Promise<PatientsSummaryWrapperDto> {
     });
 }
 
+async function getData(
+    status: string,
+    page: number,
+    pageSize: number
+): Promise<PatientsSummaryWrapperDto> {
+    const useMock = process.env.USE_MOCK_DATA === 'true';
+
+    // Si no hay URL configurada o se fuerza mock, usar datos mock
+    if (useMock) {
+        console.log('📝 Using MOCK data for patient profiles');
+        return getMockData();
+    }
+
+    // Si hay URL, hacer fetch real
+    try {
+        return await fetchFromApi(status, page, pageSize);
+    } catch (error) {
+        // Si falla y estás en desarrollo, puedes retornar mock como fallback
+        if (process.env.NODE_ENV === 'development') {
+            console.warn('⚠️ API call failed, falling back to MOCK data');
+            return getMockData();
+        }
+        // En producción, relanzar el error
+        throw error;
+    }
+}
+
 //Mapper helper
 function mapToPatientSummary(dto: PatientSummaryDto): PatientSummary {
     return {
@@ -90,7 +152,7 @@ export default async function fetchPatientsSummaryData(
     maxPage: number;
     patients: PatientSummary[];
 }> {
-    const wrapper = await getData();
+    const wrapper = await getData(status, currentPage, pageSize);
     return {
         totalResults: wrapper.totalResults,
         currentPage: wrapper.currentPage,
