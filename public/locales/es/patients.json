@@ -1,0 +1,14 @@
+{
+  "page-header": "Pacientes",
+  "active": "Activos",
+  "inactive": "Inactivos",
+  "archived": "Archivados",
+  "open-detail": "Ver detalle",
+  "table-header": "Fichas de filiación",
+  "name-table-header": "Nombre",
+  "document-type-table-header": "Tipo de documento",
+  "document-tag-table-header": "Número de documento",
+  "legal-guardian-table-header": "Responsable legal",
+  "legal-guardian-phone-table-header": "Teléfono de responsable legal",
+  "initial-assessment-date-table-header": "Fecha de evaluación inicial"
+}

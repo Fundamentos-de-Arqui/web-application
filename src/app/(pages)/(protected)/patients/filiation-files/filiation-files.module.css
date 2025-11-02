@@ -1,0 +1,17 @@
+.controlsDiv {
+    flex: 1;
+}
+
+.dataTableDiv {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 16px;
+    flex: 4;
+    padding: 24px;
+}
+
+.center {
+    vertical-align: center;
+    height: 100%;
+}

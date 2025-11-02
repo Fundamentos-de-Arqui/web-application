@@ -14,7 +14,7 @@ export const NavSectionHeader = ({ labelKey }: NavSectionHeaderProps) => {
     const i18n = useI18n();
 
     useEffect(() => {
-        i18n.loadChunk(NAV_NAME_SPACE).then(() => {});
+        void i18n.loadChunk(NAV_NAME_SPACE);
     }, [i18n.loadChunk]);
 
     return (

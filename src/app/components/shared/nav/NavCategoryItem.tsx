@@ -19,7 +19,7 @@ export const NavCategoryItem= (itemProps : NavCategoryItemProps) => {
     const i18n = useI18n();
 
     useEffect(() => {
-        i18n.loadChunk(NAV_NAME_SPACE).then(r => {});
+        void i18n.loadChunk(NAV_NAME_SPACE);
     }, [i18n.loadChunk])
 
     return (

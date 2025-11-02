@@ -1,0 +1,14 @@
+{
+  "page-header": "Patients",
+  "active": "Active",
+  "inactive": "Inactive",
+  "archived": "Archived",
+  "open-detail": "Open detail",
+  "table-header": "Filiation files summary",
+  "name-table-header": "Name",
+  "document-type-table-header": "ID Document Type",
+  "document-tag-table-header": "ID Number",
+  "legal-guardian-table-header": "Legal Guardian",
+  "legal-guardian-phone-table-header": "Legal Guardian Phone",
+  "initial-assessment-date-table-header": "Initial Assessment Date"
+}
