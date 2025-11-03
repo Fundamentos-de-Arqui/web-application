@@ -21,11 +21,11 @@ interface PatientsSummaryWrapperDto {
 }
 
 async function fetchFromApi(status: string, page: number, pageSize: number): Promise<PatientsSummaryWrapperDto> {
-    const ApiUrl = process.env.PATIENTS_SUMMARY_ENDPOINT;
+    const ApiUrl = process.env.NEXT_PUBLIC_FILIATION_FILES_ENDPOINT;
 
     const params = new URLSearchParams({
         status: status,
-        pageSize: pageSize.toString(),
+        page_size: pageSize.toString(),
         page: page.toString(),
     });
 
@@ -106,7 +106,7 @@ async function getData(
     page: number,
     pageSize: number
 ): Promise<PatientsSummaryWrapperDto> {
-    const useMock = process.env.USE_MOCK_DATA === 'true';
+    const useMock = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
 
     // Si no hay URL configurada o se fuerza mock, usar datos mock
     if (useMock) {

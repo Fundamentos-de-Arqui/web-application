@@ -110,9 +110,14 @@ export default async function getFiliationFileData(id: number): Promise<Response
         });
     }
 
+    const params = new URLSearchParams({
+        patientId: id.toString(),
+        versionNumber: "1",
+        orderBy: "DESC"
+    });
 
 
-    const endpoint = `${apiUrl}/${id}`;
+    const endpoint = `${apiUrl}?${params.toString()}`;
     try {
         const response = await fetch(endpoint, {
             method: 'GET',
