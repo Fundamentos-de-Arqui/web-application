@@ -30,7 +30,7 @@ export async function generateStaticParams() {
 }
 
 export default async function RootLayout(
-    {children}: { children: React.ReactNode; params: { locale: string } }
+    {children}: { children: React.ReactNode; }
 ) {
     const initialChunks = await loadServerDictionary(DEFAULT_LOCALE);
 
