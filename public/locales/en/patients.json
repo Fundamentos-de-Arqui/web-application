@@ -10,5 +10,12 @@
   "document-tag-table-header": "ID Number",
   "legal-guardian-table-header": "Legal Guardian",
   "legal-guardian-phone-table-header": "Legal Guardian Phone",
-  "initial-assessment-date-table-header": "Initial Assessment Date"
+  "initial-assessment-date-table-header": "Initial Assessment Date",
+  "import-title": "Import Excel forms",
+  "import-select-file": "Select file",
+  "import-upload": "Upload",
+  "import-uploading": "Uploading...",
+  "import-success": "File imported successfully",
+  "import-error": "Error importing file",
+  "import-invalid-file-type": "Please select an Excel file (.xlsx or .xls)"
 }

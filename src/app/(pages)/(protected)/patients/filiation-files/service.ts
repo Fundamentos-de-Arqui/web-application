@@ -160,3 +160,30 @@ export default async function fetchPatientsSummaryData(
         patients: wrapper.patients.map(mapToPatientSummary),
     };
 }
+
+export async function uploadExcelFile(file: File): Promise<void> {
+    // Usar la API route de Next.js como proxy para evitar problemas de CORS
+    const apiUrl = '/api/excel/upload-and-process';
+    
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            body: formData,
+            // No incluir Content-Type header, el navegador lo establecerá automáticamente con el boundary correcto
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ error: response.statusText }));
+            throw new Error(errorData.error || `Error al subir el archivo: ${response.statusText}`);
+        }
+
+        // El endpoint solo importa, no procesa, así que solo verificamos que la respuesta sea exitosa
+        console.log('Archivo subido exitosamente al endpoint de importación');
+    } catch (error) {
+        console.error('Error uploading Excel file:', error);
+        throw error;
+    }
+}

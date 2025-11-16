@@ -5,6 +5,7 @@ import {useEffect, useMemo, useState} from 'react';
 import {useI18n} from '@/app/providers/i18n';
 import FiliationFilesTabs from "@/app/(pages)/(protected)/patients/filiation-files/components/FiliationFilesTabs";
 import FiliationFilesSummaryTable from "@/app/(pages)/(protected)/patients/filiation-files/components/FiliationFilesSummaryTable";
+import ExcelImportArea from "@/app/(pages)/(protected)/patients/filiation-files/components/ExcelImportArea";
 import Pager from "@/app/components/shared/Pager";
 import fetchPatientsSummaryData from "@/app/(pages)/(protected)/patients/filiation-files/service";
 import {Title1} from "@fluentui/react-text";
@@ -81,6 +82,7 @@ export default function PatientsFiliationFilesPage() {
                 <FiliationFilesTabs activeTab={activeTab} setTab={setTab}/>
             </div>
             <div className={styles.dataTableDiv}>
+                <ExcelImportArea />
                 <Title1>{i18n.t(PATIENTS_NAME_SPACE, "table-header")}</Title1>
                 <FiliationFilesSummaryTable patients={paginatedPatientList}/>
                 <Pager
