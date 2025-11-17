@@ -10,5 +10,12 @@
   "document-tag-table-header": "Número de documento",
   "legal-guardian-table-header": "Responsable legal",
   "legal-guardian-phone-table-header": "Teléfono de responsable legal",
-  "initial-assessment-date-table-header": "Fecha de evaluación inicial"
+  "initial-assessment-date-table-header": "Fecha de evaluación inicial",
+  "import-title": "Importar formularios Excel",
+  "import-select-file": "Seleccionar archivo",
+  "import-upload": "Subir",
+  "import-uploading": "Subiendo...",
+  "import-success": "Archivo importado exitosamente",
+  "import-error": "Error al importar el archivo",
+  "import-invalid-file-type": "Por favor seleccione un archivo Excel (.xlsx o .xls)"
 }
