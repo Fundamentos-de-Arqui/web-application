@@ -1,13 +1,12 @@
-import React, {useEffect} from 'react';
 import { TabList, Tab } from '@fluentui/react-tabs';
-import {useI18n} from "@/app/providers/i18n";
+import React from "react";
 
 const PATIENTS_NAME_SPACE = "patients"
 
 const FILIATION_TABS = [
-    { value: 1, key: 'active', translationKey: 'active' },
-    { value: 2, key: 'inactive', translationKey: 'inactive' },
-    { value: 3, key: 'archived', translationKey: 'archived' },
+    { value: 1, key: 'active', translationKey: 'Activos' },
+    { value: 2, key: 'inactive', translationKey: 'Inactivos' },
+    { value: 3, key: 'archived', translationKey: 'Archivados' },
 ];
 
 interface PatientsFiliationFilesTabsProps {
@@ -16,12 +15,6 @@ interface PatientsFiliationFilesTabsProps {
 }
 
 export default function FiliationFilesTabs({ activeTab, setTab }: PatientsFiliationFilesTabsProps) {
-    const i18n = useI18n();
-
-    useEffect(() => {
-        void i18n.loadChunk(PATIENTS_NAME_SPACE);
-    }, [i18n.loadChunk])
-
     return (
         <TabList
             selectedValue={activeTab}
@@ -32,7 +25,7 @@ export default function FiliationFilesTabs({ activeTab, setTab }: PatientsFiliat
                     value={tab.value}
                     onClick={() => setTab(tab.value)}
                 >
-                    {i18n.t(PATIENTS_NAME_SPACE, tab.translationKey)}
+                    {tab.translationKey}
                 </Tab>
             ))}
         </TabList>

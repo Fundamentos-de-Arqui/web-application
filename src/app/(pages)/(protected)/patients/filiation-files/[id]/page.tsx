@@ -51,9 +51,7 @@ function InfoField({ label, value }: { label: string; value: string | number | u
 }
 
 export default async function FiliationFilePage({ params }: Props) {
-    console.log('🔍 Params recibidos:', params);
-    console.log('🔍 Params como JSON:', JSON.stringify(params, null, 2));
-    const { id } = params;
+    const { id } = await params;
 
     // Convertir el id de string a number para el service
     const idNumber = parseInt(id, 10);
@@ -64,7 +62,6 @@ export default async function FiliationFilePage({ params }: Props) {
 
     try {
         const data = await getFiliationFileData(idNumber);
-        console.log('✅ Page: Datos recibidos del service:', data);
 
         const patient = data.patient;
         const therapist = data.therapist;

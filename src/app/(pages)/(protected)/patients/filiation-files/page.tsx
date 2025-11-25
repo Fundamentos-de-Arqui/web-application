@@ -2,7 +2,6 @@
 
 import styles from './filiation-files.module.css';
 import {useEffect, useMemo, useState} from 'react';
-import {useI18n} from '@/app/providers/i18n';
 import FiliationFilesTabs from "@/app/(pages)/(protected)/patients/filiation-files/components/FiliationFilesTabs";
 import FiliationFilesSummaryTable from "@/app/(pages)/(protected)/patients/filiation-files/components/FiliationFilesSummaryTable";
 import ExcelImportArea from "@/app/(pages)/(protected)/patients/filiation-files/components/ExcelImportArea";
@@ -10,8 +9,6 @@ import Pager from "@/app/components/shared/Pager";
 import fetchPatientsSummaryData from "@/app/(pages)/(protected)/patients/filiation-files/service";
 import {Title1} from "@fluentui/react-text";
 import {PatientSummary, Status} from "@/app/(pages)/(protected)/patients/filiation-files/model/PatientSummary";
-
-const PATIENTS_NAME_SPACE = 'patients';
 
 export default function PatientsFiliationFilesPage() {
     const [fullPatientList, setFullPatientsList] = useState<PatientSummary[]>([]);
@@ -71,11 +68,6 @@ export default function PatientsFiliationFilesPage() {
         return filteredPatientsList.slice(startIndex, endIndex);
     }, [filteredPatientsList, currentPage, pageSize]);
 
-    const i18n = useI18n();
-    useEffect(() => {
-        void i18n.loadChunk(PATIENTS_NAME_SPACE);
-    }, [i18n.loadChunk]);
-
     return (
         <div className="main-column">
             <div className={styles.controlsDiv}>
@@ -83,7 +75,7 @@ export default function PatientsFiliationFilesPage() {
             </div>
             <div className={styles.dataTableDiv}>
                 <ExcelImportArea />
-                <Title1>{i18n.t(PATIENTS_NAME_SPACE, "table-header")}</Title1>
+                <Title1>Fichas de filiación</Title1>
                 <FiliationFilesSummaryTable patients={paginatedPatientList}/>
                 <Pager
                     currentPage={currentPage}

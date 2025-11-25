@@ -11,8 +11,6 @@ function isCategory(item: NavItemProps | NavCategoryProps): item is NavCategoryP
     return 'items' in item;
 }
 
-
-// 4. Componente NavRenderer Final
 export const NavRenderer: React.FC<NavRendererProps> = ({ items }) => {
     return (
         <>

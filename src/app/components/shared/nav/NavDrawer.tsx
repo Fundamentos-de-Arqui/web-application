@@ -68,7 +68,7 @@ export default function NavDrawer() {
                     {sections.map((section, index) => (
                         <React.Fragment key={section.labelKey || `section-${index}`}>
                             {section.labelKey && (
-                                <NavSectionHeader labelKey={section.labelKey} />
+                                <NavSectionHeader label={section.labelKey} />
                             )}
                             <NavRenderer items={section.items} />
                             {index < sections.length - 1 && <NavDivider />}

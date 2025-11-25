@@ -1,12 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button, Text, makeStyles, Spinner } from '@fluentui/react-components';
 import { ArrowUpload24Regular, Document24Regular } from '@fluentui/react-icons';
-import { useI18n } from '@/app/providers/i18n';
 import { uploadExcelFile } from '../service';
-
-const PATIENTS_NAME_SPACE = 'patients';
 
 const useStyles = makeStyles({
     container: {
@@ -45,16 +42,10 @@ export default function ExcelImportArea() {
     const [isUploading, setIsUploading] = useState(false);
     const [uploadStatus, setUploadStatus] = useState<{ type: 'success' | 'error' | null; message: string }>({ type: null, message: '' });
     const styles = useStyles();
-    const i18n = useI18n();
-
-    useEffect(() => {
-        void i18n.loadChunk(PATIENTS_NAME_SPACE);
-    }, [i18n.loadChunk]);
 
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            // Validar que sea un archivo Excel
             const validExtensions = ['.xlsx', '.xls'];
             const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
             
@@ -64,7 +55,7 @@ export default function ExcelImportArea() {
             } else {
                 setUploadStatus({ 
                     type: 'error', 
-                    message: i18n.t(PATIENTS_NAME_SPACE, 'import-invalid-file-type') 
+                    message: "Por favor seleccione un archivo Excel (.xlsx o .xls)"
                 });
                 setSelectedFile(null);
             }
@@ -81,7 +72,7 @@ export default function ExcelImportArea() {
             await uploadExcelFile(selectedFile);
             setUploadStatus({ 
                 type: 'success', 
-                message: i18n.t(PATIENTS_NAME_SPACE, 'import-success') 
+                message: "Archivo importado exitosamente"
             });
             setSelectedFile(null);
             // Reset file input
@@ -94,7 +85,7 @@ export default function ExcelImportArea() {
                 type: 'error', 
                 message: error instanceof Error 
                     ? error.message 
-                    : i18n.t(PATIENTS_NAME_SPACE, 'import-error') 
+                    : "Error al importar el archivo"
             });
         } finally {
             setIsUploading(false);
@@ -103,7 +94,7 @@ export default function ExcelImportArea() {
 
     return (
         <div className={styles.container}>
-            <Text weight="semibold">{i18n.t(PATIENTS_NAME_SPACE, 'import-title')}</Text>
+            <Text weight="semibold">Importar formularios Excel</Text>
             <div className={styles.uploadArea}>
                 <input
                     id="excel-file-input"
@@ -119,7 +110,7 @@ export default function ExcelImportArea() {
                     onClick={() => document.getElementById('excel-file-input')?.click()}
                     disabled={isUploading}
                 >
-                    {i18n.t(PATIENTS_NAME_SPACE, 'import-select-file')}
+                    Seleccionar archivo
                 </Button>
                 
                 {selectedFile && (
@@ -135,9 +126,7 @@ export default function ExcelImportArea() {
                     disabled={!selectedFile || isUploading}
                     icon={isUploading ? <Spinner size="tiny" /> : undefined}
                 >
-                    {isUploading 
-                        ? i18n.t(PATIENTS_NAME_SPACE, 'import-uploading') 
-                        : i18n.t(PATIENTS_NAME_SPACE, 'import-upload')}
+                    {isUploading ? "Subiendo..." : "Subir"}
                 </Button>
             </div>
             
