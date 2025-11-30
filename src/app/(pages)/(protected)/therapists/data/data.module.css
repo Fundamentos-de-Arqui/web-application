@@ -1,0 +1,79 @@
+.headerDiv {
+    flex: 1;
+    padding: 24px;
+}
+
+.dataDiv {
+    flex: 4;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 24px;
+}
+
+.tableContainer {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.loadingContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+.errorContainer {
+    padding: 24px;
+    text-align: center;
+}
+
+.emptyContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    gap: 16px;
+}
+
+.refreshButton {
+    margin-bottom: 16px;
+    align-self: flex-start;
+}
+
+.profileCard {
+    padding: 16px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.profileHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.profileGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.profileField {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.fieldLabel {
+    font-weight: 600;
+    color: #616161;
+    font-size: 0.875rem;
+}
+
+.fieldValue {
+    font-size: 1rem;
+}

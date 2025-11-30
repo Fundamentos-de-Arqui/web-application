@@ -1,0 +1,67 @@
+.formDiv {
+    flex: 4;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 24px;
+}
+
+.headerDiv {
+    flex: 1;
+    padding: 24px;
+}
+
+.formContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 1200px;
+    width: 100%;
+}
+
+.formCard {
+    padding: 32px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.formRow {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.fullWidth {
+    grid-column: span 2;
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 16px;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 24px;
+}
+
+.loadingContainer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+@media (max-width: 768px) {
+    .formGrid {
+        grid-template-columns: 1fr;
+    }
+    
+    .fullWidth {
+        grid-column: span 1;
+    }
+}
