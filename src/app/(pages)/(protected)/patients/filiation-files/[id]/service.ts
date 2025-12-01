@@ -96,7 +96,7 @@ function getMockData(id: number): ResponseGet {
     };
 }
 export default async function getFiliationFileData(id: number): Promise<ResponseGet> {
-    const apiUrl = process.env.NEXT_PUBLIC_FILIATION_FILES_ENDPOINT || 'https://soulware.site/api/profile/getFiliationFiles';
+    const apiUrl = process.env.NEXT_PUBLIC_FILIATION_FILES_ENDPOINT || 'https://soulware.site/api/profiles/getFiliationFiles';
     const useMock = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
 
     // Si no hay URL configurada o se fuerza mock, usar datos mock
