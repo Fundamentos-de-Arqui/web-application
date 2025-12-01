@@ -40,7 +40,7 @@ export default function PatientsFiliationFilesPage() {
     //Change any search filter -> query the backend service
     useEffect(() => {
         const fetchData = async () => {
-            const response = await fetchPatientsSummaryData(status, currentPage, pageSize);
+            const response = await fetchPatientsSummaryData(status, currentPage - 1, pageSize);
             setFullPatientsList(prev => {
                 const merged = new Map();
                 prev.forEach(p => merged.set(p.id, p));
