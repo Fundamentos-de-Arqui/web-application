@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
         const requestData = await request.json();
         
         // URL del endpoint backend
-        const backendUrl = process.env.THERAPIST_REGISTER_ENDPOINT || 'soulware.site/api/register';
+        const backendUrl = process.env.THERAPIST_REGISTER_ENDPOINT || 'https://soulware.site/api/register';
 
         console.log('Proxying therapist registration to:', backendUrl);
 
