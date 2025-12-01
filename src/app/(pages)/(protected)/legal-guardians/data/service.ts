@@ -11,74 +11,102 @@ export interface LegalGuardianProfile {
     relationship: string;
 }
 
-export interface LegalGuardiansResponse {
-    success: boolean;
-    message?: string;
-    data?: LegalGuardianProfile[];
-}
+// Fetch legal guardians profiles with mock fallback
+async function fetchFromApi(): Promise<LegalGuardianProfile[]> {
+    // Use Next.js API route as proxy to avoid CORS issues
+    const ApiUrl = '/api/legal-guardians';
 
-// Fetch legal guardians profiles
-export async function fetchLegalGuardiansProfiles(): Promise<LegalGuardiansResponse> {
-    const apiUrl = process.env.NEXT_PUBLIC_LEGAL_GUARDIANS_PROFILES_ENDPOINT || 'http://20.3.3.31:4000/api/profiles/legal-responsible';
+    console.log(`Fetching legal guardians from API proxy: ${ApiUrl}`);
 
     try {
-        console.log('Fetching legal guardians profiles from:', apiUrl);
-
-        const response = await fetch(apiUrl, {
+        const response = await fetch(ApiUrl, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-            },
+            }
         });
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: response.statusText }));
-            throw new Error(errorData.message || `Error al obtener perfiles de responsables legales: ${response.statusText}`);
+            const errorData = await response.json().catch(() => ({ error: response.statusText }));
+            throw new Error(errorData.error || `Failed to fetch legal guardians: ${response.statusText}`);
         }
 
         const data = await response.json();
-        console.log('Legal guardians profiles fetched successfully:', data);
-
-        return {
-            success: true,
-            message: 'Perfiles obtenidos exitosamente',
-            data: data
-        };
-    } catch (error) {
-        console.error('Error fetching legal guardians profiles:', error);
+        console.log('API Response:', data);
         
-        return {
-            success: false,
-            message: error instanceof Error ? error.message : 'Error desconocido al obtener perfiles de responsables legales',
-            data: []
-        };
+        // Check if the response has the expected structure
+        if (data && data.legalResponsible && Array.isArray(data.legalResponsible)) {
+            return data.legalResponsible;
+        } else if (data && data.legalResponsibles && Array.isArray(data.legalResponsibles)) {
+            return data.legalResponsibles;
+        } else if (data && data.guardians && Array.isArray(data.guardians)) {
+            return data.guardians;
+        } else if (Array.isArray(data)) {
+            // Fallback if the response is directly an array
+            return data;
+        } else {
+            throw new Error('Invalid response format from API');
+        }
+    } catch (error) {
+        console.error('Error fetching legal guardians:', error);
+        throw error;
     }
 }
 
 // Mock data for development
-export function getMockLegalGuardiansData(): LegalGuardianProfile[] {
-    return [
-        {
-            documentType: "DNI",
-            email: "carmen.perez@gmail.com",
-            firstNames: "Carmen Rosa",
-            id: 1,
-            identityDocumentNumber: "18456723",
-            maternalSurname: "González",
-            paternalSurname: "Pérez",
-            phone: "+51987123456",
-            relationship: "Madre"
-        },
-        {
-            documentType: "DNI",
-            email: "roberto.jimenez@hotmail.com",
-            firstNames: "Roberto Carlos",
-            id: 2,
-            identityDocumentNumber: "19567834",
-            maternalSurname: "Morales",
-            paternalSurname: "Jiménez",
-            phone: "+51976234567",
-            relationship: "Padre"
+async function getMockData(): Promise<LegalGuardianProfile[]> {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            const guardians = [
+                {
+                    documentType: "DNI" as const,
+                    email: "carmen.perez@gmail.com",
+                    firstNames: "Carmen Rosa",
+                    id: 1,
+                    identityDocumentNumber: "18456723",
+                    maternalSurname: "González",
+                    paternalSurname: "Pérez",
+                    phone: "+51987123456",
+                    relationship: "Madre"
+                },
+                {
+                    documentType: "DNI" as const,
+                    email: "roberto.jimenez@hotmail.com",
+                    firstNames: "Roberto Carlos",
+                    id: 2,
+                    identityDocumentNumber: "19567834",
+                    maternalSurname: "Morales",
+                    paternalSurname: "Jiménez",
+                    phone: "+51976234567",
+                    relationship: "Padre"
+                }
+            ];
+
+            resolve(guardians);
+        }, 500);
+    });
+}
+
+// Main fetch function with fallback logic
+export default async function fetchLegalGuardiansData(): Promise<LegalGuardianProfile[]> {
+    const useMock = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
+
+    // Si no hay URL configurada o se fuerza mock, usar datos mock
+    if (useMock) {
+        console.log('📝 Using MOCK data for legal guardians');
+        return getMockData();
+    }
+
+    // Si hay URL, hacer fetch real
+    try {
+        return await fetchFromApi();
+    } catch (error) {
+        // Si falla y estás en desarrollo, puedes retornar mock como fallback
+        if (process.env.NODE_ENV === 'development') {
+            console.warn('⚠️ API call failed, falling back to MOCK data');
+            return getMockData();
         }
-    ];
+        // En producción, relanzar el error
+        throw error;
+    }
 }

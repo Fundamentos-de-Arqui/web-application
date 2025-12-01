@@ -22,7 +22,8 @@ export interface TherapistRegistrationResponse {
 export async function registerTherapist(
     therapistData: TherapistRegistrationRequest
 ): Promise<TherapistRegistrationResponse> {
-    const apiUrl = process.env.NEXT_PUBLIC_THERAPIST_REGISTER_ENDPOINT || 'http://20.3.3.31:4000/api/register';
+    // Use Next.js API route as proxy to avoid CORS issues
+    const apiUrl = '/api/therapists/register';
 
     try {
         console.log('Registering therapist:', therapistData);
@@ -36,8 +37,8 @@ export async function registerTherapist(
         });
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: response.statusText }));
-            throw new Error(errorData.message || `Error al registrar terapeuta: ${response.statusText}`);
+            const errorData = await response.json().catch(() => ({ error: response.statusText }));
+            throw new Error(errorData.error || `Error al registrar terapeuta: ${response.statusText}`);
         }
 
         const data = await response.json();

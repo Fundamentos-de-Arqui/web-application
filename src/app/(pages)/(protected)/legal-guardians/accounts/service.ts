@@ -21,7 +21,8 @@ export interface LegalGuardianRegistrationResponse {
 export async function registerLegalGuardian(
     guardianData: LegalGuardianRegistrationRequest
 ): Promise<LegalGuardianRegistrationResponse> {
-    const apiUrl = process.env.NEXT_PUBLIC_LEGAL_GUARDIAN_REGISTER_ENDPOINT || 'http://20.3.3.31:4000/api/register';
+    // Use Next.js API route as proxy to avoid CORS issues
+    const apiUrl = '/api/legal-guardians/register';
 
     try {
         console.log('Registering legal guardian:', guardianData);
@@ -35,8 +36,8 @@ export async function registerLegalGuardian(
         });
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: response.statusText }));
-            throw new Error(errorData.message || `Error al registrar responsable legal: ${response.statusText}`);
+            const errorData = await response.json().catch(() => ({ error: response.statusText }));
+            throw new Error(errorData.error || `Error al registrar responsable legal: ${response.statusText}`);
         }
 
         const data = await response.json();

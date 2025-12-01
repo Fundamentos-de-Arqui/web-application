@@ -12,76 +12,100 @@ export interface TherapistProfile {
     attentionPlaceAddress: string;
 }
 
-export interface TherapistsResponse {
-    success: boolean;
-    message?: string;
-    data?: TherapistProfile[];
-}
+// Fetch therapists profiles with mock fallback
+async function fetchFromApi(): Promise<TherapistProfile[]> {
+    // Use Next.js API route as proxy to avoid CORS issues
+    const ApiUrl = '/api/therapists';
 
-// Fetch therapists profiles
-export async function fetchTherapistsProfiles(): Promise<TherapistsResponse> {
-    const apiUrl = process.env.NEXT_PUBLIC_THERAPISTS_PROFILES_ENDPOINT || 'http://20.3.3.31:4000/api/profiles/therapists';
+    console.log(`Fetching therapists from API proxy: ${ApiUrl}`);
 
     try {
-        console.log('Fetching therapists profiles from:', apiUrl);
-
-        const response = await fetch(apiUrl, {
+        const response = await fetch(ApiUrl, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-            },
+            }
         });
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: response.statusText }));
-            throw new Error(errorData.message || `Error al obtener perfiles de terapeutas: ${response.statusText}`);
+            const errorData = await response.json().catch(() => ({ error: response.statusText }));
+            throw new Error(errorData.error || `Failed to fetch therapists: ${response.statusText}`);
         }
 
         const data = await response.json();
-        console.log('Therapists profiles fetched successfully:', data);
-
-        return {
-            success: true,
-            message: 'Perfiles obtenidos exitosamente',
-            data: data
-        };
-    } catch (error) {
-        console.error('Error fetching therapists profiles:', error);
+        console.log('API Response:', data);
         
-        return {
-            success: false,
-            message: error instanceof Error ? error.message : 'Error desconocido al obtener perfiles de terapeutas',
-            data: []
-        };
+        // Check if the response has the expected structure
+        if (data && data.therapists && Array.isArray(data.therapists)) {
+            return data.therapists;
+        } else if (Array.isArray(data)) {
+            // Fallback if the response is directly an array
+            return data;
+        } else {
+            throw new Error('Invalid response format from API');
+        }
+    } catch (error) {
+        console.error('Error fetching therapists:', error);
+        throw error;
     }
 }
 
 // Mock data for development
-export function getMockTherapistsData(): TherapistProfile[] {
-    return [
-        {
-            attentionPlaceAddress: "Centro de Salud Mental, Av. Arequipa 1245, Miraflores, Lima",
-            documentType: "DNI",
-            email: "ana.rodriguez@terapiaclinica.com",
-            firstNames: "Ana Sofía",
-            id: 1,
-            identityDocumentNumber: "25468731",
-            maternalSurname: "Martínez",
-            paternalSurname: "Rodríguez",
-            phone: "+51987654321",
-            specialtyName: "Psicología Clínica"
-        },
-        {
-            attentionPlaceAddress: "Clínica Pediátrica San Juan, Av. Brasil 567, Magdalena, Lima",
-            documentType: "DNI",
-            email: "carlos.garcia@infancia.com",
-            firstNames: "Carlos Eduardo",
-            id: 2,
-            identityDocumentNumber: "26589473",
-            maternalSurname: "López",
-            paternalSurname: "García",
-            phone: "+51965432187",
-            specialtyName: "Psicología Infantil"
+async function getMockData(): Promise<TherapistProfile[]> {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            const therapists = [
+                {
+                    attentionPlaceAddress: "Centro de Salud Mental, Av. Arequipa 1245, Miraflores, Lima",
+                    documentType: "DNI" as const,
+                    email: "ana.rodriguez@terapiaclinica.com",
+                    firstNames: "Ana Sofía",
+                    id: 1,
+                    identityDocumentNumber: "25468731",
+                    maternalSurname: "Martínez",
+                    paternalSurname: "Rodríguez",
+                    phone: "+51987654321",
+                    specialtyName: "Psicología Clínica"
+                },
+                {
+                    attentionPlaceAddress: "Clínica Pediátrica San Juan, Av. Brasil 567, Magdalena, Lima",
+                    documentType: "DNI" as const,
+                    email: "carlos.garcia@infancia.com",
+                    firstNames: "Carlos Eduardo",
+                    id: 2,
+                    identityDocumentNumber: "26589473",
+                    maternalSurname: "López",
+                    paternalSurname: "García",
+                    phone: "+51965432187",
+                    specialtyName: "Psicología Infantil"
+                }
+            ];
+
+            resolve(therapists);
+        }, 500);
+    });
+}
+
+// Main fetch function with fallback logic
+export default async function fetchTherapistsData(): Promise<TherapistProfile[]> {
+    const useMock = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
+
+    // Si no hay URL configurada o se fuerza mock, usar datos mock
+    if (useMock) {
+        console.log('📝 Using MOCK data for therapists');
+        return getMockData();
+    }
+
+    // Si hay URL, hacer fetch real
+    try {
+        return await fetchFromApi();
+    } catch (error) {
+        // Si falla y estás en desarrollo, puedes retornar mock como fallback
+        if (process.env.NODE_ENV === 'development') {
+            console.warn('⚠️ API call failed, falling back to MOCK data');
+            return getMockData();
         }
-    ];
+        // En producción, relanzar el error
+        throw error;
+    }
 }
