@@ -21,7 +21,7 @@ interface PatientsSummaryWrapperDto {
 }
 
 async function fetchFromApi(status: string, page: number, pageSize: number): Promise<PatientsSummaryWrapperDto> {
-    const ApiUrl = process.env.NEXT_PUBLIC_FILIATION_FILES_ENDPOINT;
+    const ApiUrl = process.env.NEXT_PUBLIC_PATIENTS_SUMMARY_ENDPOINT || 'https://soulware.site/api/profile/getPatientProfiles';
 
     const params = new URLSearchParams({
         status: status,
