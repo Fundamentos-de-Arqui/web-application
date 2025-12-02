@@ -22,7 +22,7 @@ interface PatientsSummaryWrapperDto {
 
 async function fetchFromApi(status: string, page: number, pageSize: number): Promise<PatientsSummaryWrapperDto> {
     // Use Next.js API route as proxy to avoid CORS issues
-    const ApiUrl = '/api/patients';
+    const ApiUrl = process.env.NEXT_PUBLIC_PATIENTS_SUMMARY_ENDPOINT || 'https://soulware.site/api/profiles/getPatientProfiles';
 
     const params = new URLSearchParams({
         status: status,
