@@ -96,7 +96,6 @@ function getMockData(id: number): ResponseGet {
     };
 }
 export default async function getFiliationFileData(id: number): Promise<ResponseGet> {
-    const apiUrl = process.env.NEXT_PUBLIC_FILIATION_FILES_ENDPOINT || 'https://soulware.site/api/profiles/getFiliationFiles';
     const useMock = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
 
     // Si no hay URL configurada o se fuerza mock, usar datos mock
@@ -110,30 +109,45 @@ export default async function getFiliationFileData(id: number): Promise<Response
         });
     }
 
-    const params = new URLSearchParams({
-        patientId: id.toString(),
-        versionNumber: "1",
-        orderBy: "DESC"
-    });
+    // Use API route for the special endpoint that requires GET with body
+    const apiUrl = '/api/medical-records';
 
-    const endpoint = `${apiUrl}?${params.toString()}`;
+    const requestBody = {
+        patientId: id,
+        versionNumber: 2,
+        orderBy: "null",
+        page: 0,
+        size: 10
+    };
+
     try {
-        const response = await fetch(endpoint, {
-            method: 'GET',
+        console.log('Fetching medical records for patient ID:', id);
+        
+        const response = await fetch(apiUrl, {
+            method: 'POST', // Use POST to send the body to the proxy
             headers: {
                 'Content-Type': 'application/json',
-            }
+            },
+            body: JSON.stringify(requestBody)
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to fetch filiation file: ${response.statusText}`);
+            const errorData = await response.json().catch(() => ({ error: response.statusText }));
+            throw new Error(errorData.error || `Failed to fetch filiation file: ${response.statusText}`);
         }
 
         const data = await response.json();
-        console.log(data);
+        console.log('Medical records data:', data);
         return data;
     } catch (error) {
         console.error('Error fetching filiation file:', error);
+        
+        // Fallback to mock data in development if API fails
+        if (process.env.NODE_ENV === 'development') {
+            console.warn('⚠️ API call failed, falling back to MOCK data');
+            return getMockData(id);
+        }
+        
         throw error;
     }
 }
