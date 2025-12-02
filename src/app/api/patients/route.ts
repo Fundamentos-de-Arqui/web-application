@@ -5,11 +5,8 @@ export async function GET(request: NextRequest) {
         // Extract search parameters
         const { searchParams } = new URL(request.url);
         const status = searchParams.get('status') || 'ACTIVE';
-        const pageParam = searchParams.get('page') || '0';
+        const page = searchParams.get('page') || '0';
         const pageSize = searchParams.get('page_size') || '10';
-
-        // Convert page from 0-based to 1-based if needed
-        const page = Math.max(1, parseInt(pageParam) + 1).toString();
 
         // URL del endpoint backend - usar la IP que funciona como principal
         const backendUrl = process.env.PATIENTS_SUMMARY_ENDPOINT || 'http://20.3.3.31:4000/api/profiles/getPatientProfiles';

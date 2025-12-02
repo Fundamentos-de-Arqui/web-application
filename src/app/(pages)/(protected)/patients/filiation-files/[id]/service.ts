@@ -98,10 +98,9 @@ function getMockData(id: number): ResponseGet {
 export default async function getFiliationFileData(id: number): Promise<ResponseGet> {
     const useMock = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
 
-    // Si no hay URL configurada o se fuerza mock, usar datos mock
+    // Solo usar mock si está explícitamente configurado
     if (useMock) {
         console.log('📝 Usando datos MOCK para ID:', id);
-        // Simular delay de red
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve(getMockData(id));
@@ -109,8 +108,12 @@ export default async function getFiliationFileData(id: number): Promise<Response
         });
     }
 
-    // Use API route for the special endpoint that requires GET with body
-    const apiUrl = '/api/medical-records';
+    // Build the correct URL for API route
+    const isServerSide = typeof window === 'undefined';
+    const baseUrl = isServerSide 
+        ? process.env.NEXTAUTH_URL || process.env.VERCEL_URL || 'http://localhost:3000'
+        : '';
+    const apiUrl = `${baseUrl}/api/medical-records`;
 
     const requestBody = {
         patientId: id,
@@ -121,10 +124,12 @@ export default async function getFiliationFileData(id: number): Promise<Response
     };
 
     try {
-        console.log('Fetching medical records for patient ID:', id);
+        console.log('Fetching medical records for patient ID:', id, '(via API route)', 
+                   isServerSide ? 'server-side' : 'client-side');
+        console.log('Using URL:', apiUrl);
         
         const response = await fetch(apiUrl, {
-            method: 'POST', // Use POST to send the body to the proxy
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -137,17 +142,31 @@ export default async function getFiliationFileData(id: number): Promise<Response
         }
 
         const data = await response.json();
-        console.log('Medical records data:', data);
+        console.log('Medical records data received:', data);
+        
+        // Check if the API response has the new structure
+        if (data && data.status === 'success' && data.record) {
+            // New API format - transform to expected structure or return mock data for now
+            console.log('New API format detected, using mock data structure for compatibility');
+            const mockData = getMockData(id);
+            // Update some fields from the actual API response
+            if (data.record) {
+                mockData.id = data.record.id || id;
+                mockData.assessmentType = data.record.assessmentType || mockData.assessmentType;
+                mockData.createdAt = data.record.createdAt || mockData.createdAt;
+                mockData.description = data.record.description || mockData.description;
+                mockData.diagnostic = data.record.diagnostic || mockData.diagnostic;
+                mockData.treatment = data.record.treatment || mockData.treatment;
+                mockData.versionNumber = data.record.versionNumber || mockData.versionNumber;
+                mockData.scheduledAt = data.record.scheduledAt || mockData.scheduledAt;
+            }
+            return mockData;
+        }
+        
+        // Original API format
         return data;
     } catch (error) {
         console.error('Error fetching filiation file:', error);
-        
-        // Fallback to mock data in development if API fails
-        if (process.env.NODE_ENV === 'development') {
-            console.warn('⚠️ API call failed, falling back to MOCK data');
-            return getMockData(id);
-        }
-        
         throw error;
     }
 }
