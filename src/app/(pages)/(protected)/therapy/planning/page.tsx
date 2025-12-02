@@ -5,9 +5,8 @@ import { Title1 } from '@fluentui/react-text';
 import {
     Button, Select, Field, Dialog, DialogSurface, DialogTitle, DialogBody,
     DialogContent, Input, Textarea, Spinner,
-    // Se eliminaron: Toast, ToastTitle, ToastBody, Toaster, useId, useToastController
-    // Manteniendo solo los componentes de UI que no dieron error
-    Dropdown, Option,
+    // Se han mantenido solo los componentes de UI necesarios
+    // Dropdown y Option se eliminan de la sección de IDs
 } from '@fluentui/react-components';
 
 // =========================================================
@@ -177,13 +176,6 @@ const dayMap: { [key in ScheduleEntry['dayOfWeek']]: string } = {
 };
 const dayOptions: ScheduleEntry['dayOfWeek'][] = Object.keys(dayMap) as ScheduleEntry['dayOfWeek'][];
 
-// Mapeo de IDs ficticios para las opciones del Dropdown
-const MOCK_IDS = {
-    therapists: Array.from({ length: 5 }, (_, i) => ({ id: i + 1, name: `Terapista #${i + 1}` })),
-    legalResponsibles: Array.from({ length: 4 }, (_, i) => ({ id: i + 1, name: `Responsable Legal #${i + 1}` })),
-    assessments: Array.from({ length: 10 }, (_, i) => ({ id: 100 + i, name: `Evaluación #${100 + i}` })),
-};
-
 /**
  * Formatea una cadena ISO 8601 a una hora legible (ej: 14:00)
  */
@@ -223,9 +215,9 @@ interface CreateTherapyPlanModalProps {
 function CreateTherapyPlanModal({ isOpen, onClose, showToast }: CreateTherapyPlanModalProps) {
     // ---------------- Estado del Formulario Principal
     const defaultPlanState: TherapyPlanCreationData = {
-        assessmentId: MOCK_IDS.assessments[0].id,
-        assignedTherapistId: MOCK_IDS.therapists[0].id,
-        legalResponsibleId: MOCK_IDS.legalResponsibles[0].id,
+        assessmentId: 0, // Inicia en 0 para ser ingresado manualmente
+        assignedTherapistId: 0, // Inicia en 0 para ser ingresado manualmente
+        legalResponsibleId: 0, // Inicia en 0 para ser ingresado manualmente
         description: "",
         goals: "",
         schedule: [],
@@ -255,8 +247,9 @@ function CreateTherapyPlanModal({ isOpen, onClose, showToast }: CreateTherapyPla
 
     // Manejadores de cambio de input (Planes)
     const handlePlanDataChange = (field: keyof TherapyPlanCreationData, value: any) => {
+        // Convierte solo si el campo es uno de los IDs, sino usa el valor tal cual
         const finalValue = (field === 'assessmentId' || field === 'assignedTherapistId' || field === 'legalResponsibleId')
-            ? parseInt(value)
+            ? parseInt(value) || 0 // Si no es un número válido, usa 0
             : value;
 
         setPlanData(prev => ({ ...prev, [field]: finalValue }));
@@ -329,12 +322,20 @@ function CreateTherapyPlanModal({ isOpen, onClose, showToast }: CreateTherapyPla
         e.preventDefault();
         setLoading(true);
 
-        // Validación de campos principales y schedule
+        // Validación de campos principales y IDs
         if (!planData.description || !planData.goals) {
             showToast("Error de Validación", "La descripción y los objetivos son obligatorios.", 'error');
             setLoading(false);
             return;
         }
+
+        // **Validación de IDs (Deben ser mayores a 0)**
+        if (planData.assessmentId <= 0 || planData.assignedTherapistId <= 0 || planData.legalResponsibleId <= 0) {
+            showToast("Error de IDs", "Los IDs de Evaluación, Terapista y Responsable Legal deben ser números válidos.", 'error');
+            setLoading(false);
+            return;
+        }
+
         if (planData.schedule.length === 0) {
             showToast("Error de Horario", "Debe agregar al menos una sesión al horario.", 'error');
             setLoading(false);
@@ -360,6 +361,9 @@ function CreateTherapyPlanModal({ isOpen, onClose, showToast }: CreateTherapyPla
 
     if (!isOpen) return null;
 
+    // Función de ayuda para mostrar 0 como cadena vacía en el input
+    const displayValue = (id: number) => id === 0 ? '' : String(id);
+
     // UI del Pop-up
     return (
         <Dialog open={isOpen} onOpenChange={(_, data) => data.open === false && onClose()}>
@@ -371,54 +375,40 @@ function CreateTherapyPlanModal({ isOpen, onClose, showToast }: CreateTherapyPla
                     <DialogContent>
 
                         <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* IDs y Metadatos */}
+                            {/* IDs y Metadatos (Ahora Inputs de texto/número) */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {/* Assessment ID */}
+
+                                {/* Assessment ID (INPUT) */}
                                 <Field label="ID Evaluación Requerida" required>
-                                    <Dropdown
-                                        aria-labelledby="assessment-label"
-                                        placeholder="Seleccione Evaluación"
-                                        onSelect={(_, data) => handlePlanDataChange('assessmentId', data.optionValue)}
-                                        value={String(planData.assessmentId)}
-                                    >
-                                        {MOCK_IDS.assessments.map(item => (
-                                            <Option key={item.id} value={String(item.id)}>
-                                                {item.name}
-                                            </Option>
-                                        ))}
-                                    </Dropdown>
+                                    <Input
+                                        type="number"
+                                        placeholder="Ej: 101"
+                                        value={displayValue(planData.assessmentId)}
+                                        onChange={(e) => handlePlanDataChange('assessmentId', e.target.value)}
+                                        min={1}
+                                    />
                                 </Field>
 
-                                {/* Therapist ID */}
+                                {/* Therapist ID (INPUT) */}
                                 <Field label="ID Terapista Asignado" required>
-                                    <Dropdown
-                                        aria-labelledby="therapist-label"
-                                        placeholder="Seleccione Terapista"
-                                        onSelect={(_, data) => handlePlanDataChange('assignedTherapistId', data.optionValue)}
-                                        value={String(planData.assignedTherapistId)}
-                                    >
-                                        {MOCK_IDS.therapists.map(item => (
-                                            <Option key={item.id} value={String(item.id)}>
-                                                {item.name}
-                                            </Option>
-                                        ))}
-                                    </Dropdown>
+                                    <Input
+                                        type="number"
+                                        placeholder="Ej: 5"
+                                        value={displayValue(planData.assignedTherapistId)}
+                                        onChange={(e) => handlePlanDataChange('assignedTherapistId', e.target.value)}
+                                        min={1}
+                                    />
                                 </Field>
 
-                                {/* Legal Responsible ID */}
+                                {/* Legal Responsible ID (INPUT) */}
                                 <Field label="ID Responsable Legal" required>
-                                    <Dropdown
-                                        aria-labelledby="responsible-label"
-                                        placeholder="Seleccione Responsable"
-                                        onSelect={(_, data) => handlePlanDataChange('legalResponsibleId', data.optionValue)}
-                                        value={String(planData.legalResponsibleId)}
-                                    >
-                                        {MOCK_IDS.legalResponsibles.map(item => (
-                                            <Option key={item.id} value={String(item.id)}>
-                                                {item.name}
-                                            </Option>
-                                        ))}
-                                    </Dropdown>
+                                    <Input
+                                        type="number"
+                                        placeholder="Ej: 2"
+                                        value={displayValue(planData.legalResponsibleId)}
+                                        onChange={(e) => handlePlanDataChange('legalResponsibleId', e.target.value)}
+                                        min={1}
+                                    />
                                 </Field>
                             </div>
 
@@ -566,7 +556,8 @@ function CreateTherapyPlanModal({ isOpen, onClose, showToast }: CreateTherapyPla
                                 <Button
                                     appearance="primary"
                                     type="submit"
-                                    disabled={loading || !planData.description || !planData.goals || planData.schedule.length === 0}
+                                    // Validación más estricta para IDs, descripción, objetivos y horario
+                                    disabled={loading || !planData.description || !planData.goals || planData.schedule.length === 0 || planData.assessmentId <= 0 || planData.assignedTherapistId <= 0 || planData.legalResponsibleId <= 0}
                                 >
                                     {loading ? <Spinner size="tiny" /> : 'Guardar y Crear Plan'}
                                 </Button>
