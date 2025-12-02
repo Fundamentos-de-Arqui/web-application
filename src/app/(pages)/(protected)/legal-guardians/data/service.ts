@@ -13,7 +13,7 @@ export interface LegalGuardianProfile {
 
 // Fetch legal guardians profiles with mock fallback
 async function fetchFromApi(): Promise<LegalGuardianProfile[]> {
-    const ApiUrl = '/api/legal-guardians';
+    const ApiUrl = process.env.NEXT_PUBLIC_LEGAL_GUARDIANS_PROFILES_ENDPOINT || 'https://soulware.site/api/profiles/legal-responsible';
 
     console.log(`Fetching legal guardians from API: ${ApiUrl}`);
 
@@ -26,8 +26,7 @@ async function fetchFromApi(): Promise<LegalGuardianProfile[]> {
         });
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ error: response.statusText }));
-            throw new Error(errorData.error || `Failed to fetch legal guardians: ${response.statusText}`);
+            throw new Error(`Failed to fetch legal guardians: ${response.statusText}`);
         }
 
         const data = await response.json();

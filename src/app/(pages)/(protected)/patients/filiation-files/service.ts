@@ -21,17 +21,17 @@ interface PatientsSummaryWrapperDto {
 }
 
 async function fetchFromApi(status: string, page: number, pageSize: number): Promise<PatientsSummaryWrapperDto> {
-    const ApiUrl = '/api/patients';
-    
+    const ApiUrl = process.env.NEXT_PUBLIC_PATIENTS_SUMMARY_ENDPOINT || 'https://soulware.site/api/profiles/getPatientProfiles';
+
     const params = new URLSearchParams({
         status: status,
         page_size: pageSize.toString(),
         page: page.toString(),
     });
-    
+
     const url = `${ApiUrl}?${params.toString()}`;
 
-    console.log(`Fetching patients from API: ${url}`);
+    console.log(`Fetching patients summary from API: ${url}`);
 
     try {
         const response = await fetch(url,{
@@ -42,8 +42,7 @@ async function fetchFromApi(status: string, page: number, pageSize: number): Pro
         });
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ error: response.statusText }));
-            throw new Error(errorData.error || `Failed to fetch patients summary: ${response.statusText}`);
+            throw new Error(`Failed to fetch patients summary: ${response.statusText}`);
         }
 
         const data = await response.json();
