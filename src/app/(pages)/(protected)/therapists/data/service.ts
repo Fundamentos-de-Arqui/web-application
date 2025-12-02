@@ -14,10 +14,9 @@ export interface TherapistProfile {
 
 // Fetch therapists profiles with mock fallback
 async function fetchFromApi(): Promise<TherapistProfile[]> {
-    // Use Next.js API route as proxy to avoid CORS issues
-    const ApiUrl = '/api/therapists';
+    const ApiUrl = process.env.NEXT_PUBLIC_THERAPISTS_PROFILES_ENDPOINT || 'https://soulware.site/api/profiles/therapists';
 
-    console.log(`Fetching therapists from API proxy: ${ApiUrl}`);
+    console.log(`Fetching therapists from API: ${ApiUrl}`);
 
     try {
         const response = await fetch(ApiUrl, {
@@ -28,8 +27,7 @@ async function fetchFromApi(): Promise<TherapistProfile[]> {
         });
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ error: response.statusText }));
-            throw new Error(errorData.error || `Failed to fetch therapists: ${response.statusText}`);
+            throw new Error(`Failed to fetch therapists: ${response.statusText}`);
         }
 
         const data = await response.json();
