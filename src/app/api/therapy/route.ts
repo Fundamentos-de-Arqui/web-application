@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-/*
+
 export async function GET(request: NextRequest) {
     try {
         // URL del endpoint backend
@@ -37,4 +37,4 @@ export async function GET(request: NextRequest) {
             { status: 500 }
         );
     }
-}*/
+}

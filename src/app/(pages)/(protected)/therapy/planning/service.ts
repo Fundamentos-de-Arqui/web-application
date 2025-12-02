@@ -1,94 +1,113 @@
-export type DayOfWeek = "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY";
-
-export interface ScheduleItem {
-    dayOfWeek: DayOfWeek;
-    endTime: string;
-    startTime: string;
+export interface ScheduleEntry {
+    dayOfWeek: "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY";
+    startTime: string; // Cadena ISO 8601, ej., "2025-12-22T20:30:00Z"
+    endTime: string;   // Cadena ISO 8601, ej., "2025-12-22T21:30:00Z"
 }
 
 export interface TherapyPlanData {
-    assessmentId: number;
-    assignedTherapistId: number;
-    description: string;
-    goals: string;
     id: number;
-    legalResponsibleId: number;
     patientId: number;
-    schedule: ScheduleItem[];
-}
-
-export interface TherapyPlanCreationPayload {
     assessmentId: number;
+    assignedTherapistId: number;
     description: string;
     goals: string;
-    assignedTherapistId: number;
     legalResponsibleId: number;
-    schedule: ScheduleItem[];
-}
-
-export interface TherapyPlanResponse {
-    status: "success" | "error" | string;
-    data: TherapyPlanData;
-    timestamp: string;
-}
-
-export interface TherapyPlanList {
-    items: TherapyPlanData[];
-    page: number;
-    size: number;
-    totalItems: number;
-    totalPages: number;
-}
-
-export interface TherapyPlanListResponse {
-    status: "success" | "error" | string;
-    data: TherapyPlanList;
-    timestamp: string;
+    schedule: ScheduleEntry[];
 }
 
 export interface TherapyPlanQueryParams {
     page?: number;
     size?: number;
-    assessmentId?: number;
-    therapistId?: number;
-    patientId?: number;
+}
+
+export interface TherapyPlanListResponse {
+    data: {
+        items: TherapyPlanData[];
+        page: number;
+        size: number;
+        totalItems: number;
+        totalPages: number;
+    };
 }
 
 const API_ROUTE = '/api/therapy-plans';
 
-export async function createTherapyPlan(
-    payload: TherapyPlanCreationPayload
-): Promise<TherapyPlanResponse> {
+const RESPONSABLES = [
+    { name: "Ana Lucía Fernández Delgado", phone: "+51954456789", id: 1 },
+    { name: "Carmen Rosa Pérez González", phone: "+51987123456", id: 2 },
+    { name: "Rosa María Castro Vargas", phone: "+51965345678", id: 3 },
+    { name: "Roberto Carlos Jiménez Morales", phone: "+51976234567", id: 4 },
+];
 
-    console.log('Enviando payload al proxy de Next.js:', API_ROUTE, payload);
+const DAYS_OF_WEEK: ScheduleEntry["dayOfWeek"][] = ["MONDAY", "WEDNESDAY", "FRIDAY", "SATURDAY"];
 
-    try {
-        const response = await fetch(API_ROUTE, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-        });
+const generateMockSchedule = (id: number): ScheduleEntry[] => {
+    const schedules: ScheduleEntry[] = [];
+    const numSessions = Math.floor(Math.random() * 2) + 1;
 
-        if (!response.ok) {
-            let errorDetail = response.statusText;
-            try {
-                const errorData = await response.json();
-                errorDetail = errorData.error || errorData.message || response.statusText;
-            } catch (e) {
-            }
-            throw new Error(`Error ${response.status}: ${errorDetail}`);
-        }
+    for (let i = 0; i < numSessions; i++) {
+        const day = DAYS_OF_WEEK[(id + i) % DAYS_OF_WEEK.length];
+        const hour = 10 + (id % 8);
+        const date = new Date();
+        date.setFullYear(2025);
+        date.setMonth(11); // Diciembre
+        date.setDate(20 + i);
+        date.setHours(hour, 0, 0, 0);
 
-        const data: TherapyPlanResponse = await response.json();
-        console.log('Plan de Terapia creado exitosamente. ID:', data.data.id);
-        return data;
+        const startTime = date.toISOString().replace(/\.\d{3}Z$/, 'Z');
+        date.setHours(hour + 1);
+        const endTime = date.toISOString().replace(/\.\d{3}Z$/, 'Z');
 
-    } catch (error) {
-        console.error('Error en el servicio createTherapyPlan:', error);
-        throw error;
+        schedules.push({ dayOfWeek: day, startTime, endTime });
     }
+    return schedules;
+}
+
+const generateMockPlan = (id: number, index: number): TherapyPlanData => {
+    const responsible = RESPONSABLES[index % RESPONSABLES.length];
+
+    let patientName = `Paciente Ejemplo ${id}`;
+    if (id === 1) patientName = "Camila Alejandra Fernández Romero";
+    if (id === 2) patientName = "Diego Alejandro Pérez Martín";
+    if (id === 3) patientName = "Isabella Sofía Castro Mendoza";
+
+    return {
+        id,
+        patientId: 50 + id,
+        assessmentId: 100 + id,
+        assignedTherapistId: Math.floor(Math.random() * 10) + 1,
+        description: `Plan de rehabilitación para ${patientName}`,
+        goals: `Meta: Mejorar la funcionalidad en ${id}% en las próximas 8 semanas.`,
+        legalResponsibleId: responsible.id,
+        schedule: generateMockSchedule(id),
+    };
+};
+
+const MOCK_PLANS: TherapyPlanData[] = Array.from({ length: 100 }, (_, i) => generateMockPlan(i + 1, i));
+
+export function getMockTherapyPlans(params: TherapyPlanQueryParams): TherapyPlanListResponse {
+    let filteredPlans = MOCK_PLANS;
+
+    const totalItems = filteredPlans.length;
+    const page = params.page || 1;
+    const size = params.size || 10;
+    const totalPages = Math.ceil(totalItems / size);
+
+    const finalPage = Math.min(Math.max(1, page), totalPages) || 1;
+    const finalStartIndex = (finalPage - 1) * size;
+    const finalEndIndex = finalStartIndex + size;
+
+    const paginatedItems = filteredPlans.slice(finalStartIndex, finalEndIndex);
+
+    return {
+        data: {
+            items: paginatedItems,
+            page: finalPage,
+            size: size,
+            totalItems: totalItems,
+            totalPages: totalPages,
+        }
+    };
 }
 
 export async function getTherapyPlans(
@@ -103,7 +122,7 @@ export async function getTherapyPlans(
     });
 
     const apiUrlWithParams = `${API_ROUTE}?${query.toString()}`;
-    console.log('Obteniendo planes de terapia de:', apiUrlWithParams);
+    console.log('Intentando obtener planes de terapia de:', apiUrlWithParams);
 
     try {
         const response = await fetch(apiUrlWithParams, {
@@ -121,15 +140,19 @@ export async function getTherapyPlans(
                 errorDetail = errorData.error || errorData.message || response.statusText;
             } catch (e) {
             }
-            throw new Error(`Error ${response.status}: ${errorDetail}`);
+            console.warn(`Error ${response.status} al conectar con API. Usando mock data. Detalle: ${errorDetail}`);
+
+            return getMockTherapyPlans(params);
         }
 
         const data: TherapyPlanListResponse = await response.json();
-        console.log(`Planes de Terapia obtenidos. Total: ${data.data.totalItems}`);
+        console.log(`Planes de Terapia obtenidos del API. Total: ${data.data.totalItems}`);
         return data;
 
     } catch (error) {
-        console.error('Error en el servicio getTherapyPlans:', error);
-        throw error;
+        console.error('Error de conexión con el backend (red/servidor). Usando mock data.', error);
+
+        await new Promise(resolve => setTimeout(resolve, 500));
+        return getMockTherapyPlans(params);
     }
 }
