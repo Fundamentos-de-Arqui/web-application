@@ -8,8 +8,8 @@ export async function GET(request: NextRequest) {
         const page = searchParams.get('page') || '1';
         const pageSize = searchParams.get('page_size') || '10';
 
-        // URL del endpoint backend
-        const backendUrl = process.env.PATIENTS_SUMMARY_ENDPOINT || 'https://soulware.site/api/profiles/getPatientProfiles';
+        // URL del endpoint backend - usar la IP que funciona como principal
+        const backendUrl = process.env.PATIENTS_SUMMARY_ENDPOINT || 'http://20.3.3.31:4000/api/profiles/getPatientProfiles';
         
         // Build the full URL with parameters
         const params = new URLSearchParams({
