@@ -96,13 +96,11 @@ function getMockData(id: number): ResponseGet {
     };
 }
 export default async function getFiliationFileData(id: number): Promise<ResponseGet> {
-    const apiUrl = process.env.NEXT_PUBLIC_FILIATION_FILES_ENDPOINT || 'https://soulware.site/api/profiles/getFiliationFiles';
     const useMock = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
 
     // Si no hay URL configurada o se fuerza mock, usar datos mock
     if (useMock) {
         console.log('📝 Usando datos MOCK para ID:', id);
-        // Simular delay de red
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve(getMockData(id));
@@ -110,14 +108,21 @@ export default async function getFiliationFileData(id: number): Promise<Response
         });
     }
 
+    // Use the medical records endpoint with query parameters
+    const apiUrl = process.env.NEXT_PUBLIC_MEDICAL_RECORDS_ENDPOINT || 'https://soulware.site/api/clinical-folders/medical-records';
+
     const params = new URLSearchParams({
         patientId: id.toString(),
-        versionNumber: "1",
-        orderBy: "DESC"
+        versionNumber: "2",
+        orderBy: "null",
+        page: "0",
+        size: "10"
     });
 
     const endpoint = `${apiUrl}?${params.toString()}`;
     try {
+        console.log('Fetching medical records for patient ID:', id, 'from:', endpoint);
+        
         const response = await fetch(endpoint, {
             method: 'GET',
             headers: {
@@ -130,7 +135,26 @@ export default async function getFiliationFileData(id: number): Promise<Response
         }
 
         const data = await response.json();
-        console.log(data);
+        console.log('Medical records data received:', data);
+        
+        // Handle new API format
+        if (data && data.status === 'success' && data.record) {
+            console.log('New API format detected, using mock data structure for compatibility');
+            const mockData = getMockData(id);
+            if (data.record) {
+                mockData.id = data.record.id || id;
+                mockData.assessmentType = data.record.assessmentType || mockData.assessmentType;
+                mockData.createdAt = data.record.createdAt || mockData.createdAt;
+                mockData.description = data.record.description || mockData.description;
+                mockData.diagnostic = data.record.diagnostic || mockData.diagnostic;
+                mockData.treatment = data.record.treatment || mockData.treatment;
+                mockData.versionNumber = data.record.versionNumber || mockData.versionNumber;
+                mockData.scheduledAt = data.record.scheduledAt || mockData.scheduledAt;
+            }
+            return mockData;
+        }
+        
+        // Original API format fallback
         return data;
     } catch (error) {
         console.error('Error fetching filiation file:', error);
